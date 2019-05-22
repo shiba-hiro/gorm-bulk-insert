@@ -3,10 +3,11 @@ package gormbulk
 import (
 	"errors"
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 // Insert multiple records at once
@@ -97,8 +98,8 @@ func extractMapValue(value interface{}, excludeColumns []string) (map[string]int
 		_, hasForeignKey := field.TagSettingsGet("FOREIGNKEY")
 
 		if !containString(excludeColumns, field.Struct.Name) && field.StructField.Relationship == nil && !hasForeignKey &&
-			!field.IsIgnored && !(field.DBName == "id" && field.IsPrimaryKey) {
-			if field.Struct.Name == "CreatedAt" || field.Struct.Name == "UpdatedAt" {
+			!field.IsIgnored {
+			if (field.Struct.Name == "CreatedAt" || field.Struct.Name == "UpdatedAt") && field.Field.Interface() == nil {
 				attrs[field.DBName] = time.Now()
 			} else if field.StructField.HasDefaultValue && field.IsBlank {
 				// If default value presents and field is empty, assign a default value
